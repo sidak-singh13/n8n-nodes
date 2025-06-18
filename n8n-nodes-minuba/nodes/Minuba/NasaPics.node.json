@@ -1,19 +1,19 @@
 {
-	"node": "n8n-nodes-base.NasaPics",
+	"node": "n8n-nodes-base.Minuba",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": [
-		"Miscellaneous"
+		"Data & Analytics"
 	],
 	"resources": {
 		"credentialDocumentation": [
 			{
-				"url": ""
+				"url": "https://docs.minuba.com/api/authentication"
 			}
 		],
 		"primaryDocumentation": [
 			{
-				"url": ""
+				"url": "https://docs.minuba.com/api"
 			}
 		]
 	}

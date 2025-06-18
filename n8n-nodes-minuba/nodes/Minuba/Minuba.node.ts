@@ -9,20 +9,20 @@ export class Minuba implements INodeType {
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Get data from Minuba API',
+		description: 'Interact with Minuba API for data processing and analytics',
 		defaults: {
-			name: 'Minuba API',
+			name: 'Minuba',
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
 		credentials: [
 			{
-				name: 'NasaPicsApi',
+				name: 'MinubaApi',
 				required: true,
 			},
 		],
 		requestDefaults: {
-			baseURL: 'https://api.nasa.gov',
+			baseURL: 'https://app.minuba.dk/api',
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
@@ -36,15 +36,15 @@ export class Minuba implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Astronomy Picture of the Day',
-						value: 'astronomyPictureOfTheDay',
+						name: 'Data Processing',
+						value: 'dataProcessing',
 					},
 					{
-						name: 'Mars Rover Photos',
-						value: 'marsRoverPhotos',
+						name: 'Analytics',
+						value: 'analytics',
 					},
 				],
-				default: 'astronomyPictureOfTheDay',
+				default: 'dataProcessing',
 			},
 			// Operations will go here
 			{
@@ -55,25 +55,25 @@ export class Minuba implements INodeType {
 				displayOptions: {
 					show: {
 						resource: [
-							'astronomyPictureOfTheDay',
+							'dataProcessing',
 						],
 					},
 				},
 				options: [
 					{
-						name: 'Get',
-						value: 'get',
-						action: 'Get the APOD',
-						description: 'Get the Astronomy Picture of the day',
+						name: 'Process',
+						value: 'process',
+						action: 'Process data with Minuba',
+						description: 'Process data using Minuba services',
 						routing: {
 							request: {
-								method: 'GET',
-								url: '/planetary/apod',
+								method: 'POST',
+								url: '/process',
 							},
 						},
 					},
 				],
-				default: 'get',
+				default: 'process',
 			},
 			{
 				displayName: 'Operation',
@@ -83,71 +83,73 @@ export class Minuba implements INodeType {
 				displayOptions: {
 					show: {
 						resource: [
-							'marsRoverPhotos',
+							'analytics',
 						],
 					},
 				},
 				options: [
 					{
-						name: 'Get',
-						value: 'get',
-						action: 'Get Mars Rover photos',
-						description: 'Get photos from the Mars Rover',
+						name: 'Analyze',
+						value: 'analyze',
+						action: 'Analyze data with Minuba',
+						description: 'Get analytics from Minuba',
 						routing: {
 							request: {
 								method: 'GET',
+								url: '/analytics',
 							},
 						},
 					},
 				],
-				default: 'get',
+				default: 'analyze',
 			},
 			{
-				displayName: 'Rover name',
-				description: 'Choose which Mars Rover to get a photo from',
+				displayName: 'Dataset ID',
+				description: 'The ID of the dataset to process',
 				required: true,
-				name: 'roverName',
+				name: 'datasetId',
+				type: 'string',
+				default: '',
+				displayOptions: {
+					show: {
+						resource: [
+							'dataProcessing',
+						],
+					},
+				},
+				routing: {
+					request: {
+						body: {
+							datasetId: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Analysis Type',
+				description: 'Type of analysis to perform',
+				required: true,
+				name: 'analysisType',
 				type: 'options',
 				options: [
-					{name: 'Curiosity', value: 'curiosity'},
-					{name: 'Opportunity', value: 'opportunity'},
-					{name: 'Perseverance', value: 'perseverance'},
-					{name: 'Spirit', value: 'spirit'},
+					{name: 'Trend Analysis', value: 'trend'},
+					{name: 'Pattern Recognition', value: 'pattern'},
+					{name: 'Predictive Modeling', value: 'predictive'},
+					{name: 'Statistical Analysis', value: 'statistical'},
 				],
 				routing: {
 					request: {
-						url: '=/mars-photos/api/v1/rovers/{{$value}}/photos',
-					},
-				},
-				default: 'curiosity',
-				displayOptions: {
-					show: {
-						resource: [
-							'marsRoverPhotos',
-						],
-					},
-				},
-			},
-			{
-				displayName: 'Date',
-				description: 'Earth date',
-				required: true,
-				name: 'marsRoverDate',
-				type: 'dateTime',
-				default:'',
-				displayOptions: {
-					show: {
-						resource: [
-							'marsRoverPhotos',
-						],
-					},
-				},
-				routing: {
-					request: {
-						// You've already set up the URL. qs appends the value of the field as a query string
 						qs: {
-							earth_date: '={{ new Date($value).toISOString().substr(0,10) }}',
+							type: '={{$value}}',
 						},
+					},
+				},
+				default: 'trend',
+				displayOptions: {
+					show: {
+						resource: [
+							'analytics',
+						],
 					},
 				},
 			},
@@ -161,24 +163,24 @@ export class Minuba implements INodeType {
 				displayOptions: {
 					show: {
 						resource: [
-							'astronomyPictureOfTheDay',
+							'dataProcessing',
 						],
 						operation: [
-							'get',
+							'process',
 						],
 					},
 				},
 				options: [
 					{
-						displayName: 'Date',
-						name: 'apodDate',
-						type: 'dateTime',
+						displayName: 'Processing Options',
+						name: 'processingOptions',
+						type: 'string',
 						default: '',
+						description: 'Additional processing options in JSON format',
 						routing: {
 							request: {
-								// You've already set up the URL. qs appends the value of the field as a query string
-								qs: {
-									date: '={{ new Date($value).toISOString().substr(0,10) }}',
+								body: {
+									options: '={{$value}}',
 								},
 							},
 						},
